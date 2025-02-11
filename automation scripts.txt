@@ -1,0 +1,82 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using System;
+using System.Threading;
+
+class MedeasyTest
+{
+    static void Main()
+    {
+        IWebDriver driver = new ChromeDriver();
+
+        try
+        {
+            // Test Case 1: Open pharmacy Website
+            driver.Navigate().GoToUrl("https:/pharmacy");
+            driver.Manage().Window.Maximize();
+            Thread.Sleep(3000);
+            if (!driver.Title.Contains("pharmacy"))
+                throw new Exception("Website title does not match");
+            Console.WriteLine("Homepage loaded successfully.");
+
+            // Test Case 2: Check Login Functionality
+            try
+            {
+                driver.FindElement(By.LinkText("Login")).Click();
+                Thread.Sleep(2000);
+                
+                driver.FindElement(By.Name("email")).SendKeys("testuser@example.com");
+                driver.FindElement(By.Name("password")).SendKeys("password123");
+                driver.FindElement(By.Name("password")).SendKeys(Keys.Enter);
+                Thread.Sleep(3000);
+
+                if (!driver.Url.Contains("dashboard"))
+                    throw new Exception("Login failed");
+                Console.WriteLine("Login test passed.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Login test failed: {e.Message}");
+            }
+
+            // Test Case 3: Search Functionality
+            try
+            {
+                IWebElement searchBox = driver.FindElement(By.Name("search"));
+                searchBox.SendKeys("Paracetamol");
+                searchBox.SendKeys(Keys.Enter);
+                Thread.Sleep(3000);
+
+                var results = driver.FindElements(By.ClassName("product-list-item"));
+                if (results.Count == 0)
+                    throw new Exception("No search results found");
+                Console.WriteLine("Search functionality test passed.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Search test failed: {e.Message}");
+            }
+
+            // Test Case 4: Add to Cart (if applicable)
+            try
+            {
+                IWebElement addToCartButton = driver.FindElement(By.XPath("//button[contains(text(),'Add to Cart')]");
+                addToCartButton.Click();
+                Thread.Sleep(2000);
+
+                var cartItems = driver.FindElements(By.ClassName("cart-item"));
+                if (cartItems.Count == 0)
+                    throw new Exception("Cart is empty after adding an item");
+                Console.WriteLine("Add to cart test passed.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Add to cart test failed: {e.Message}");
+            }
+        }
+        finally
+        {
+            driver.Quit();
+        }
+    }
+}
